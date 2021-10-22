@@ -1,8 +1,9 @@
-( devices )
+%RTN { JMP2r }
 
 ( zero page )
 |0000
-@pixel [ &x $2 &y $2 ]
+
+( devices )
 
 |00 @System  [ &vector $2 &pad $6   &r $2 &g $2 &b $2 ]
 |10 @Console  [ $8 &write ]
@@ -12,30 +13,31 @@
 
 |100
 
-#0fa7 .System/r DEO2
-#0fa7 .System/g DEO2
-#0fa7 .System/b DEO2
-
-#0000 .pixel/x STZ2
-#0000 .pixel/y STZ2
-;font-data .Screen/addr DEO2
-
-&loop
-.pixel/x LDZ2 .Screen/x DEO2
-#01 .Screen/sprite DEO
-.Screen/addr DEI2 #0008 ADD2 .Screen/addr DEO2
-.pixel/x LDZ2 #000a ADD2 .pixel/x STZ2
-.pixel/x LDZ2 #00c7 GTH2 ,&inc-y JCN
-,&loop JMP
-
-&inc-y
-#0000 .pixel/x STZ2
-.pixel/y LDZ2 #000a ADD2 .pixel/y STZ2
-.pixel/y LDZ2 .Screen/y DEO2
-.pixel/y LDZ2 #00c7 LTH2 ,&loop JCN
+	#0fa7 .System/r DEO2
+	#0fa7 .System/g DEO2
+	#0fa7 .System/b DEO2
+	#0000 .Screen/x DEO2
+	#0000 .Screen/y DEO2
+	;on-controller .Controller/vector DEO2
 
 BRK
 
+
+@on-controller
+	.Controller/key DEI #00 EQU ,&is-zero JCN
+	.Screen/x DEI2 #0008 ADD2 .Screen/x DEO2
+	.Controller/key DEI .Console/write DEO
+	#00 .Controller/key DEI #0008 MUL2 ;font-data ADD2 .Screen/addr DEO2
+	#01 .Screen/sprite DEO
+	&is-zero
+BRK
+
+@print-hex ( value -- )
+	STHk #04 SFT ,&parse JSR .Console/write DEO
+	STHr #0f AND ,&parse JSR .Console/write DEO
+	RTN
+	&parse ( value -- char )
+		DUP #09 GTH ,&above JCN #30 ADD RTN &above #09 SUB #60 ADD RTN
 
 @font-data ( spectrum-zx font, with each character moved to be flush left in its cell )
 [
