@@ -1,6 +1,7 @@
 %RTN { JMP2r }
 
 ( zero page )
+
 |0000
 
 ( devices )
@@ -9,6 +10,7 @@
 |10 @Console  [ $8 &write ]
 |20 @Screen  [ &vector $2 &width $2 &height $2 &pad $2 &x $2 &y $2 &addr $2 &pixel $1 &sprite $1 ]
 |80 @Controller [ &vector $2 &button $1 &key $1 ]
+|a0 @File [ &vector $2 &success $2 &offset-hs $2 &offset-ls $2 &name $2 &length $2 &load $2 &save $2 ]
 
 |100
 
@@ -17,45 +19,66 @@
 	#0fa7 .System/b DEO2
 	#0000 .Screen/x DEO2
 	#0000 .Screen/y DEO2
-	;on-controller .Controller/vector DEO2
+	( ;on-controller .Controller/vector DEO2 )
+	;load-file JMP2
 
 BRK
 
-@on-controller
-
-	.Controller/key DEI #0d EQU ;print-new-line JCN2
-	.Controller/key DEI ;print-char JMP2
-
-BRK
-
-@print-char
+@print-char ( char --> )
 
 	,char STR
-	,char LDR #00 EQU ,&is-zero JCN
+	,char LDR #0a EQU ,&end JCN
+	,char LDR #00 EQU ,&end JCN
 	.Screen/x DEI2 #0008 ADD2 .Screen/x DEO2
 	#00 ,char LDR #0008 MUL2 ;font-data ADD2 .Screen/addr DEO2
 	#01 .Screen/sprite DEO
-	&is-zero
+	&end
+	RTN
 
 BRK
 
 @char $1
 
-@print-new-line
+@print-new-line ( -- )
 
+	,char LDR #0a NEQ ,&end JCN
 	.Screen/y DEI2 #0008 ADD2 .Screen/y DEO2
 	#0000 .Screen/x DEO2
+	&end
+	RTN
 
 BRK
 
+@load-file ( -- )
 
-@print-hex ( value -- )
+    ;file/name .File/name DEO2
+    #00ff .File/length DEO2 ( will attempt to read 255 bytes )
+	;file/data .File/load DEO2 ( set address for the data to read, and do read )
+    .File/success DEI2 #0000 EQU2 ,&failed JCN
 
-	STHk #04 SFT ,&parse JSR .Console/write DEO
-	STHr #0f AND ,&parse JSR .Console/write DEO
-	RTN
-	&parse ( value -- char )
-		DUP #09 GTH ,&above JCN #30 ADD RTN &above #09 SUB #60 ADD RTN
+    LIT 'Y .Console/write DEO
+	;print-file JMP2
+
+    &failed
+    LIT 'N .Console/write DEO
+
+BRK
+
+@print-file ( -- )
+
+	&loop
+	;file/data ,&counter LDR2 ADD2 LDA2 ,&char STR
+	,&char LDR ;print-char JSR2
+	,&char LDR ;print-new-line JSR2
+	,&counter LDR2 #0001 ADD2 ,&counter STR2
+	.File/success DEI2 ,&counter LDR2 GTH2 ,&loop JCN
+
+	&counter 0000
+	&char 00
+
+BRK
+
+@file &name "hello.txt 00 &data $ff ( reserving 255 bytes for the data )
 
 @font-data ( spectrum-zx font, with each character moved to be flush left in its cell )
 
@@ -93,3 +116,11 @@ BRK
 	0000 8850 2050 8800 0000 8888 8878 0870 0000 f810 2040 f800 0060 4080 8040 6000
 	0080 8080 8080 8000 00c0 4020 2040 c000 0000 0064 9800 0000 3c42 99a1 a199 423c
 ]
+
+@print-hex ( value -- )
+
+	STHk #04 SFT ,&parse JSR .Console/write DEO
+	STHr #0f AND ,&parse JSR .Console/write DEO
+	RTN
+	&parse ( value -- char )
+		DUP #09 GTH ,&above JCN #30 ADD RTN &above #09 SUB #60 ADD RTN
