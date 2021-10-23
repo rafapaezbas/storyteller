@@ -10,7 +10,6 @@
 |20 @Screen  [ &vector $2 &width $2 &height $2 &pad $2 &x $2 &y $2 &addr $2 &pixel $1 &sprite $1 ]
 |80 @Controller [ &vector $2 &button $1 &key $1 ]
 
-
 |100
 
 	#0fa7 .System/r DEO2
@@ -22,17 +21,36 @@
 
 BRK
 
-
 @on-controller
-	.Controller/key DEI #00 EQU ,&is-zero JCN
-	.Screen/x DEI2 #0008 ADD2 .Screen/x DEO2
-	.Controller/key DEI .Console/write DEO
-	#00 .Controller/key DEI #0008 MUL2 ;font-data ADD2 .Screen/addr DEO2
-	#01 .Screen/sprite DEO
-	&is-zero
+
+	.Controller/key DEI #0d EQU ;print-new-line JCN2
+	.Controller/key DEI ;print-char JMP2
+
 BRK
 
+@print-char
+
+	,char STR
+	,char LDR #00 EQU ,&is-zero JCN
+	.Screen/x DEI2 #0008 ADD2 .Screen/x DEO2
+	#00 ,char LDR #0008 MUL2 ;font-data ADD2 .Screen/addr DEO2
+	#01 .Screen/sprite DEO
+	&is-zero
+
+BRK
+
+@char $1
+
+@print-new-line
+
+	.Screen/y DEI2 #0008 ADD2 .Screen/y DEO2
+	#0000 .Screen/x DEO2
+
+BRK
+
+
 @print-hex ( value -- )
+
 	STHk #04 SFT ,&parse JSR .Console/write DEO
 	STHr #0f AND ,&parse JSR .Console/write DEO
 	RTN
@@ -40,6 +58,7 @@ BRK
 		DUP #09 GTH ,&above JCN #30 ADD RTN &above #09 SUB #60 ADD RTN
 
 @font-data ( spectrum-zx font, with each character moved to be flush left in its cell )
+
 [
 	0000 0000 0000 0000 0000 4800 fc78 0000 0000 4800 7884 0000 0000 d8f8 f870 2000
 	0020 70f8 f870 2000 0070 70f8 d820 7000 0020 70f8 f820 7000 0000 00c0 c000 0000
