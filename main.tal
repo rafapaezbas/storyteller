@@ -48,8 +48,8 @@ BRK
 @print-new-line ( -- )
 
 	,char LDR #0a NEQ ,&end JCN
-	.Screen/y DEI2 #0008 ADD2 .Screen/y DEO2
-	#0000 .Screen/x DEO2
+	.Screen/y DEI2 #000f ADD2 .Screen/y DEO2
+	#0008 .Screen/x DEO2
 	&end
 	POP
 	RTN
