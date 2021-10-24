@@ -25,19 +25,18 @@
 
 BRK
 
-@print-char ( char --> )
+@print-char ( -- )
 
-	,char STR
-	,char LDR #0a EQU ,&end JCN
-	,char LDR #00 EQU ,&end JCN
-	.Screen/x DEI2 #01c2 LTH2 ,char LDR #20 NEQ ORA ,&no-break JCN ( if char is blank and screen/x is over 450, open a new line )
+	.read-file/char LDZ #0a EQU ,&end JCN
+	.read-file/char LDZ #00 EQU ,&end JCN
+	.Screen/x DEI2 #01c2 LTH2 .read-file/char LDZ #20 NEQ ORA ,&no-break JCN ( if char is blank and screen/x is over 450, open a new line )
 	.Screen/y DEI2 #0008 ADD2 .Screen/y DEO2 #0000 .Screen/x DEO2
 	&no-break
 	.Screen/x DEI2 #0008 ADD2 .Screen/width DEI2 LTH2 ,&no-new-line JCN
 	.Screen/y DEI2 #0008 ADD2 .Screen/y DEO2 #0000 .Screen/x DEO2 ( reset line if x is in the limit )
 	&no-new-line
 	.Screen/x DEI2 #0008 ADD2 .Screen/x DEO2
-	#00 ,char LDR #0008 MUL2 ;font-data ADD2 .Screen/addr DEO2
+	#00 .read-file/char LDZ #0008 MUL2 ;font-data ADD2 .Screen/addr DEO2
 	#01 .Screen/sprite DEO
 	&end
 	POP
@@ -45,15 +44,12 @@ BRK
 
 BRK
 
-@char $1
-
 @print-new-line ( -- )
 
-	,char LDR #0a NEQ ,&end JCN
+	.read-file/char LDZ #0a NEQ ,&end JCN
 	.Screen/y DEI2 #000f ADD2 .Screen/y DEO2
 	#0008 .Screen/x DEO2
 	&end
-	POP
 	RTN
 
 BRK
@@ -82,10 +78,10 @@ BRK
 	#0000 .read-file/data-offset STZ2 ( reset data offset )
 
 	&loop
-	;file/data .read-file/data-offset LDZ2 ADD2 LDA2 .read-file/char STZ
-	.read-file/char LDZ ;print-char JSR2
-	.read-file/char LDZ ;print-new-line JSR2
-	.read-file/data-offset LDZ2 #0001 ADD2 .read-file/data-offset STZ2
+	;file/data .read-file/data-offset LDZ2 ADD2 LDA2 .read-file/char STZ ( read char at data + data-offset )
+	;print-char JSR2
+	;print-new-line JSR2
+	.read-file/data-offset LDZ2 #0001 ADD2 .read-file/data-offset STZ2 ( inc data-offset )
 	.File/success DEI2 .read-file/data-offset LDZ2 GTH2 ,&loop JCN
 
 	RTN
