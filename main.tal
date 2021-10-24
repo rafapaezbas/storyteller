@@ -21,9 +21,6 @@
 	#0fa7 .System/r DEO2
 	#0fa7 .System/g DEO2
 	#0fa7 .System/b DEO2
-	#0008 .Screen/x DEO2
-	#0008 .Screen/y DEO2
-
 	;load-file JMP2
 
 BRK
@@ -58,6 +55,9 @@ BRK
 
 @load-file ( -- )
 
+	#0008 .Screen/x DEO2
+	#0008 .Screen/y DEO2
+
     &loop
     ;file/name .File/name DEO2
     #00ff .File/length DEO2 ( will attempt to read 255 bytes )
@@ -65,7 +65,7 @@ BRK
     .File/success DEI2 #0000 EQU2 ,&failed JCN
 
     LIT 'Y .Console/write DEO
-	;print-file JSR2
+	;print-file-chunk JSR2
 
 	.File/offset-ls DEI2 #00ff ADD2 .File/offset-ls DEO2
 	.File/success DEI2 #00ff EQU2 ,&loop JCN
@@ -75,7 +75,7 @@ BRK
 
 BRK
 
-@print-file ( -- )
+@print-file-chunk ( -- )
 
 	#0000 .read-file/data-offset STZ2 ( reset data offset )
 	#00 .read-file/node-counter STZ ( reset node counter )
@@ -106,10 +106,24 @@ BRK
 
 BRK
 
+@reset-screen
+
+	#0000 .Screen/x DEO2
+	#0000 .Screen/y DEO2
+
+	&loop
+	#00 .Screen/pixel DEO
+	.Screen/x DEI2 #0001 ADD2 .Screen/x DEO2
+	.Screen/x DEI2 .Screen/width DEI2 NEQ2 ,&loop JCN
+	#0000 .Screen/x DEO2
+	.Screen/y DEI2 #0001 ADD2 .Screen/y DEO2
+	.Screen/y DEI2 .Screen/height DEI2 NEQ2 ,&loop JCN
+
+
+BRK
+
 @on-controller
-
-	.read-file/nodes #01 ADD LDZ .Console/write DEO
-
+	;reset-screen JMP2
 BRK
 
 @file &name "hello.txt 00 &data $ff ( reserving 255 bytes for the data )
