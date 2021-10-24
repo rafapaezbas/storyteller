@@ -126,7 +126,7 @@ BRK
 
 @on-controller
 
-	.Controller/key DEI #00 NEQ .Controller/key DEI .read-file/node-counter SUB #30 LTH AND ,&no-zero JCN
+	.Controller/key DEI #00 NEQ .Controller/key DEI .read-file/node-counter LDZ SUB #30 LTH AND ,&no-zero JCN
 	BRK
 	&no-zero
 
