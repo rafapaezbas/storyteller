@@ -58,13 +58,17 @@ BRK
 
 @load-file ( -- )
 
+    &loop
     ;file/name .File/name DEO2
     #00ff .File/length DEO2 ( will attempt to read 255 bytes )
 	;file/data .File/load DEO2 ( set address for the data to read, and do read )
     .File/success DEI2 #0000 EQU2 ,&failed JCN
 
     LIT 'Y .Console/write DEO
-	;print-file JMP2
+	;print-file JSR2
+
+	.File/offset-ls DEI2 #00fe ADD2 .File/offset-ls DEO2
+	.File/success DEI2 #00ff EQU2 ,&loop JCN
 
     &failed
     LIT 'N .Console/write DEO
@@ -73,12 +77,17 @@ BRK
 
 @print-file ( -- )
 
+	#0000 ,&counter STR2
+	#00 ,&char STR
+
 	&loop
 	;file/data ,&counter LDR2 ADD2 LDA2 ,&char STR
 	,&char LDR ;print-char JSR2
 	,&char LDR ;print-new-line JSR2
 	,&counter LDR2 #0001 ADD2 ,&counter STR2
 	.File/success DEI2 ,&counter LDR2 GTH2 ,&loop JCN
+
+	RTN
 
 	&counter 0000
 	&char 00
