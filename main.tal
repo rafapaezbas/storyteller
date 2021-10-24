@@ -4,6 +4,8 @@
 
 |0000
 
+@read-file [ &char $1 &next-char $1 &next-next-char $1 &data-offset $2 ]
+
 ( devices )
 
 |00 @System  [ &vector $2 &pad $6   &r $2 &g $2 &b $2 ]
@@ -77,20 +79,16 @@ BRK
 
 @print-file ( -- )
 
-	#0000 ,&counter STR2
-	#00 ,&char STR
+	#0000 .read-file/data-offset STZ2 ( reset data offset )
 
 	&loop
-	;file/data ,&counter LDR2 ADD2 LDA2 ,&char STR
-	,&char LDR ;print-char JSR2
-	,&char LDR ;print-new-line JSR2
-	,&counter LDR2 #0001 ADD2 ,&counter STR2
-	.File/success DEI2 ,&counter LDR2 GTH2 ,&loop JCN
+	;file/data .read-file/data-offset LDZ2 ADD2 LDA2 .read-file/char STZ
+	.read-file/char LDZ ;print-char JSR2
+	.read-file/char LDZ ;print-new-line JSR2
+	.read-file/data-offset LDZ2 #0001 ADD2 .read-file/data-offset STZ2
+	.File/success DEI2 .read-file/data-offset LDZ2 GTH2 ,&loop JCN
 
 	RTN
-
-	&counter 0000
-	&char 00
 
 BRK
 
