@@ -119,14 +119,77 @@ BRK
 	.Screen/y DEI2 #0001 ADD2 .Screen/y DEO2
 	.Screen/y DEI2 .Screen/height DEI2 NEQ2 ,&loop JCN
 
+	RTN
+
 
 BRK
 
 @on-controller
-	;reset-screen JMP2
+
+	.Controller/key DEI #00 NEQ .Controller/key DEI .read-file/node-counter SUB #30 LTH AND ,&no-zero JCN
+	BRK
+	&no-zero
+
+	;reset-screen JSR2
+	#0000 .read-file/data-offset STZ2
+	#0000 .File/offset-ls DEO2
+
+
+	.Controller/key DEI #31 NEQ ,&no-1 JCN
+	.read-file/nodes LDZ ;file/name STA
+	.read-file/nodes #01 ADD LDZ ;file/name #01 ADD STA
+	&no-1
+
+	.Controller/key DEI #32 NEQ ,&no-2 JCN
+	.read-file/nodes #02 ADD LDZ ;file/name STA
+	.read-file/nodes #03 ADD LDZ ;file/name #01 ADD STA
+	&no-2
+
+	.Controller/key DEI #33 NEQ ,&no-3 JCN
+	.read-file/nodes #04 ADD LDZ ;file/name #03 ADD STA
+	.read-file/nodes #05 ADD LDZ ;file/name #01 ADD STA
+	&no-3
+
+	.Controller/key DEI #34 NEQ ,&no-4 JCN
+	.read-file/nodes #06 ADD LDZ ;file/name STA
+	.read-file/nodes #07 ADD LDZ ;file/name #01 ADD STA
+	&no-4
+
+	.Controller/key DEI #35 NEQ ,&no-5 JCN
+	.read-file/nodes #08 ADD LDZ ;file/name STA
+	.read-file/nodes #09 ADD LDZ ;file/name #01 ADD STA
+	&no-5
+
+	.Controller/key DEI #36 NEQ ,&no-6 JCN
+	.read-file/nodes #10 ADD LDZ ;file/name #03 ADD STA
+	.read-file/nodes #11 ADD LDZ ;file/name #01 ADD STA
+	&no-6
+
+	.Controller/key DEI #37 NEQ ,&no-7 JCN
+	.read-file/nodes #12 ADD LDZ ;file/name STA
+	.read-file/nodes #13 ADD LDZ ;file/name #01 ADD STA
+	&no-7
+
+	.Controller/key DEI #38 NEQ ,&no-8 JCN
+	.read-file/nodes #14 ADD LDZ ;file/name STA
+	.read-file/nodes #15 ADD LDZ ;file/name #01 ADD STA
+	&no-8
+
+	.Controller/key DEI #39 NEQ ,&no-9 JCN
+	.read-file/nodes #16 ADD LDZ ;file/name #03 ADD STA
+	.read-file/nodes #17 ADD LDZ ;file/name #01 ADD STA
+	&no-9
+
+	.Controller/key DEI #30 NEQ ,&no-0 JCN
+	.read-file/nodes #18 ADD LDZ ;file/name #03 ADD STA
+	.read-file/nodes #19 ADD LDZ ;file/name #01 ADD STA
+	&no-0
+
+	;load-file JMP2
+
 BRK
 
-@file &name "hello.txt 00 &data $ff ( reserving 255 bytes for the data )
+@file &name 30 31 00 &data $ff ( reserving 255 bytes for the data )
 
 @font-data ( spectrum-zx font, with each character moved to be flush left in its cell )
 
