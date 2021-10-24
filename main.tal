@@ -83,11 +83,7 @@ BRK
 	&loop
 	;file/data .read-file/data-offset LDZ2 ADD2 LDA .read-file/char STZ ( read char at data + data-offset )
 	.read-file/char LDZ #23 NEQ ,&no-save-option JCN
-	;file/data .read-file/data-offset LDZ2 ADD2 #0001 ADD2 LDA .read-file/next-char STZ
-	;file/data .read-file/data-offset LDZ2 ADD2 #0002 ADD2 LDA .read-file/next-next-char STZ
-	.read-file/next-char LDZ .read-file/nodes #00 .read-file/node-counter LDZ ADD2 STZ
-	.read-file/data-offset LDZ2 #0003 ADD2 .read-file/data-offset STZ2
-	.read-file/node-counter LDZ #01 ADD .read-file/node-counter STZ
+	;save-option JSR2
 	.File/success DEI2 .read-file/data-offset LDZ2 GTH2 ,&loop JCN
 	&no-save-option
 	;print-char JSR2
@@ -98,9 +94,22 @@ BRK
 
 BRK
 
+@save-option ( -- )
+
+	;file/data .read-file/data-offset LDZ2 ADD2 #0001 ADD2 LDA .read-file/next-char STZ
+	;file/data .read-file/data-offset LDZ2 ADD2 #0002 ADD2 LDA .read-file/next-next-char STZ
+	.read-file/next-char LDZ .read-file/nodes .read-file/node-counter LDZ #02 MUL ADD STZ
+	.read-file/next-next-char LDZ .read-file/nodes .read-file/node-counter LDZ #02 MUL #01 ADD ADD STZ
+	.read-file/data-offset LDZ2 #0003 ADD2 .read-file/data-offset STZ2
+	.read-file/node-counter LDZ #01 ADD .read-file/node-counter STZ
+	RTN
+
+BRK
+
 @on-controller
-	.read-file/next-char LDZ .Console/write DEO
-	.read-file/next-next-char LDZ .Console/write DEO
+
+	.read-file/nodes #01 ADD LDZ .Console/write DEO
+
 BRK
 
 @file &name "hello.txt 00 &data $ff ( reserving 255 bytes for the data )
