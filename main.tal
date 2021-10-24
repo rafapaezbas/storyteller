@@ -17,8 +17,8 @@
 	#0fa7 .System/r DEO2
 	#0fa7 .System/g DEO2
 	#0fa7 .System/b DEO2
-	#0000 .Screen/x DEO2
-	#0000 .Screen/y DEO2
+	#0008 .Screen/x DEO2
+	#0008 .Screen/y DEO2
 	;load-file JMP2
 
 BRK
@@ -28,6 +28,9 @@ BRK
 	,char STR
 	,char LDR #0a EQU ,&end JCN
 	,char LDR #00 EQU ,&end JCN
+	.Screen/x DEI2 #01c2 LTH2 ,char LDR #20 NEQ ORA ,&no-break JCN ( if char is blank and screen/x is over 450, open a new line )
+	.Screen/y DEI2 #0008 ADD2 .Screen/y DEO2 #0000 .Screen/x DEO2
+	&no-break
 	.Screen/x DEI2 #0008 ADD2 .Screen/width DEI2 LTH2 ,&no-new-line JCN
 	.Screen/y DEI2 #0008 ADD2 .Screen/y DEO2 #0000 .Screen/x DEO2 ( reset line if x is in the limit )
 	&no-new-line
