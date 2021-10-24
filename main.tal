@@ -39,7 +39,6 @@ BRK
 	#00 .read-file/char LDZ #0008 MUL2 ;font-data ADD2 .Screen/addr DEO2
 	#01 .Screen/sprite DEO
 	&end
-	POP
 	RTN
 
 BRK
@@ -65,7 +64,7 @@ BRK
     LIT 'Y .Console/write DEO
 	;print-file JSR2
 
-	.File/offset-ls DEI2 #00fe ADD2 .File/offset-ls DEO2
+	.File/offset-ls DEI2 #00ff ADD2 .File/offset-ls DEO2
 	.File/success DEI2 #00ff EQU2 ,&loop JCN
 
     &failed
@@ -78,7 +77,9 @@ BRK
 	#0000 .read-file/data-offset STZ2 ( reset data offset )
 
 	&loop
-	;file/data .read-file/data-offset LDZ2 ADD2 LDA2 .read-file/char STZ ( read char at data + data-offset )
+	;file/data .read-file/data-offset LDZ2 ADD2 LDA .read-file/char STZ ( read char at data + data-offset )
+	;file/data .read-file/data-offset LDZ2 ADD2 LDA .read-file/next-char STZ
+	;file/data .read-file/data-offset LDZ2 ADD2 LDA .read-file/next-next-char STZ
 	;print-char JSR2
 	;print-new-line JSR2
 	.read-file/data-offset LDZ2 #0001 ADD2 .read-file/data-offset STZ2 ( inc data-offset )
