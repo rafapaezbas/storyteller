@@ -16,11 +16,14 @@
 
 |100
 
+	;on-controller .Controller/vector DEO2
+
 	#0fa7 .System/r DEO2
 	#0fa7 .System/g DEO2
 	#0fa7 .System/b DEO2
 	#0008 .Screen/x DEO2
 	#0008 .Screen/y DEO2
+
 	;load-file JMP2
 
 BRK
@@ -79,9 +82,9 @@ BRK
 
 	&loop
 	;file/data .read-file/data-offset LDZ2 ADD2 LDA .read-file/char STZ ( read char at data + data-offset )
-	;file/data .read-file/data-offset LDZ2 ADD2 LDA .read-file/next-char STZ
-	;file/data .read-file/data-offset LDZ2 ADD2 LDA .read-file/next-next-char STZ
 	.read-file/char LDZ #23 NEQ ,&no-save-option JCN
+	;file/data .read-file/data-offset LDZ2 ADD2 #0001 ADD2 LDA .read-file/next-char STZ
+	;file/data .read-file/data-offset LDZ2 ADD2 #0002 ADD2 LDA .read-file/next-next-char STZ
 	.read-file/next-char LDZ .read-file/nodes #00 .read-file/node-counter LDZ ADD2 STZ
 	.read-file/data-offset LDZ2 #0003 ADD2 .read-file/data-offset STZ2
 	.read-file/node-counter LDZ #01 ADD .read-file/node-counter STZ
@@ -93,6 +96,11 @@ BRK
 	.File/success DEI2 .read-file/data-offset LDZ2 GTH2 ,&loop JCN
 	RTN
 
+BRK
+
+@on-controller
+	.read-file/next-char LDZ .Console/write DEO
+	.read-file/next-next-char LDZ .Console/write DEO
 BRK
 
 @file &name "hello.txt 00 &data $ff ( reserving 255 bytes for the data )
