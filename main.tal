@@ -4,7 +4,7 @@
 
 |0000
 
-@read-file [ &char $1 &next-char $1 &next-next-char $1 &data-offset $2 &node-counter $1 &nodes $20 ]
+@read-file [ &char $1 &next-char $1 &next-next-char $1 &data-offset $2 &node-counter $1 &nodes $18 ]
 
 ( devices )
 
@@ -179,11 +179,6 @@ BRK
 	.read-file/nodes #16 ADD LDZ ;file/name #03 ADD STA
 	.read-file/nodes #17 ADD LDZ ;file/name #01 ADD STA
 	&no-9
-
-	.Controller/key DEI #30 NEQ ,&no-0 JCN
-	.read-file/nodes #18 ADD LDZ ;file/name #03 ADD STA
-	.read-file/nodes #19 ADD LDZ ;file/name #01 ADD STA
-	&no-0
 
 	;load-file JMP2
 
