@@ -1,5 +1,7 @@
 # Storyteller
 
+![storyteller screenshot](https://user-images.githubusercontent.com/15270736/138777610-ec3f7c10-bb26-45b6-84f4-26864bdeab23.jpg)
+
 Storyteller is a minimal interactive fiction engine for the [uxn](https://wiki.xxiivv.com/site/uxn.html) virtual machine.
 
 ## How does it work?
