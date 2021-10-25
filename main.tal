@@ -222,11 +222,3 @@ BRK
 	0000 8850 2050 8800 0000 8888 8878 0870 0000 f810 2040 f800 0060 4080 8040 6000
 	0080 8080 8080 8000 00c0 4020 2040 c000 0000 0064 9800 0000 3c42 99a1 a199 423c
 ]
-
-@print-hex ( value -- )
-
-	STHk #04 SFT ,&parse JSR .Console/write DEO
-	STHr #0f AND ,&parse JSR .Console/write DEO
-	RTN
-	&parse ( value -- char )
-		DUP #09 GTH ,&above JCN #30 ADD RTN &above #09 SUB #60 ADD RTN
